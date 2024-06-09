@@ -4,6 +4,7 @@ require __DIR__ . '/src/includes/conn.php';
 
 use FastRoute\RouteCollector;
 use function FastRoute\simpleDispatcher;
+date_default_timezone_set("America/Sao_Paulo");
 
 $dispatcher = simpleDispatcher(function(RouteCollector $r) {
     require __DIR__ . '/src/routes.php';
@@ -33,6 +34,47 @@ switch ($routeInfo[0]) {
         $vars = $routeInfo[2];
         [$controller, $method] = $handler;
         $controller = new $controller($conn);
+
+        $data = [];
+
+        if($controller instanceof \Controller\PostController) {
+            $data = getPostsData();
+        } else if($controller instanceof \Controller\AuthController) {
+            if($method === 'login') {
+                $data = getLoginData();
+            } else if($method === 'signup') {
+                $data = getSignupData();
+            }
+        }
+
+        $data = array_merge($data, $vars);
         call_user_func_array([$controller, $method], $vars);
         break;
+}
+
+function getPostsData() {
+    return [
+        'title' => $_POST["title"],
+        'summary' => $_POST["summary"],
+        'content' => $_POST["content"],
+        'author' => $_POST["author"],
+        'date' => date("Y-m-d"),
+        'time' => date("H:i:s")
+    ];
+}
+
+function getLoginData() {
+    return [
+        'email' => $_POST["email"],
+        'password' => $_POST["password"]
+    ];
+}
+
+function getSignupData() {
+    return [
+        'name' => $_POST["name"],
+        'email' => $_POST["email"],
+        'password' => $_POST["password"],
+        'confirmPassword' => $_POST["confirmPassword"]
+    ];
 }
