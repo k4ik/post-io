@@ -1,5 +1,6 @@
 <template>
     <main class="main">
+        <Message :data="msg" />
         <div class="container">
             <div class="flex absolute top-7p left-19p gap-1 items-center">
                 <img src="../assets/images/logo.png" alt="logo" class="w-12">
@@ -23,6 +24,7 @@
 
 <script>
 import { Mail, Lock } from "lucide-vue-next";
+import Message from "../components/Message.vue";
 
 export default {
     methods: {
@@ -43,12 +45,17 @@ export default {
         }
     },
     components: {
-        Mail, Lock
+        Mail, Lock, Message
+    },
+    data() {
+        return {
+            msg: ""
+        }
     },
 }
 </script>
 
-<style>
+<style scoped>
     .main {
         @apply bg-purple h-screen text-text-color font-poppins flex justify-center items-center;
     }

@@ -57,7 +57,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .main {
         @apply bg-purple h-screen text-text-color font-poppins flex justify-center items-center;
     }
