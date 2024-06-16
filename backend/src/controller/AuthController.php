@@ -6,7 +6,7 @@ use PDOException;
 use Respect\Validation\Validator as v;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-
+use Dotenv\Dotenv;
 
 class AuthController 
 {
@@ -38,18 +38,14 @@ class AuthController
             if($stmt->execute()) {
                 $count = $stmt->rowCount();
                 if($count === 1) {
-                    $key = "";
-                    $payload = [
-                        'email' => $email,
-                    ];
-
-                    $jwt = JWT::encode($payload, $key, 'HS256');
-                    echo json_encode(["token" => $jwt]);
+                    $key = $_ENV["KEY"];
+                    $token = $this->generateToken($email, $key);
+                    echo json_encode(["token" => $token]);
                 } else {
                     echo json_encode(["error" => "Usuário não encontrado."]);
                 }
             } else {
-                echo json_encode(["error" => ""]);
+                echo json_encode(["error" => "Ocorreu um erro."]);
             }
         } catch(PDOException $e) {
             echo json_encode((["error" => $e->getMessage()]));
@@ -81,12 +77,24 @@ class AuthController
             $stmt->bindParam(':password', $password);
 
             if($stmt->execute()) {
-                echo json_encode(["success" => ""]);
+                $key = $_ENV["KEY"];
+                $token = $this->generateToken($email, $key);
+                echo json_encode(["token" => $token]);
             } else {
-                echo json_encode(["error" => ""]);
+                echo json_encode(["error" => "Ocorreu um erro."]);
             }
         } catch(PDOException $e) {
             echo json_encode(["error" => $e->getMessage()]);
         }
     }    
+
+    public function generateToken($email, $key) 
+    {
+        $payload = [
+            'email' => $email,
+        ];
+
+        $jwt = JWT::encode($payload, $key, 'HS256');
+        return $jwt;
+    }
 }
